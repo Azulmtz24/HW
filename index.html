@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para: Dylancito 🏁💙 | Carta Interactiva</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Outfit:wght@300;400;500;600;700&family=Russo+One&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Canvas Confetti CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#07070d',
+                        darkCard: '#0e0f1d',
+                        indigoBase: '#151632',
+                        indigoMid: '#222557',
+                        indigoVibrant: '#4f46e5',
+                        indigoNeon: '#6366f1',
+                        indigoGlow: '#818cf8',
+                        raceBlue: '#3b82f6'
+                    },
+                    fontFamily: {
+                        racing: ['"Russo One"', 'sans-serif'],
+                        letter: ['"Caveat"', 'cursive'],
+                        sans: ['"Outfit"', 'sans-serif'],
+                        tech: ['"Space Grotesk"', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #07070d;
+            color: #f1f5f9;
+            font-family: 'Outfit', sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Ambient Background Grid & Race Glow */
+        .bg-race-ambient {
+            background-image: 
+                radial-gradient(circle at 50% 30%, rgba(99, 102, 241, 0.22) 0%, transparent 65%),
+                radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.15) 0%, transparent 55%),
+                linear-gradient(to bottom, #06060b, #0c0d1b);
+        }
+
+        /* Speed Lines Pattern */
+        .speed-lines {
+            background-image: repeating-linear-gradient(
+                -45deg,
+                rgba(99, 102, 241, 0.035),
+                rgba(99, 102, 241, 0.035) 2px,
+                transparent 2px,
+                transparent 14px
+            );
+        }
+
+        /* Checkered Flag Pattern Edge */
+        .checker-border {
+            background-color: #080914;
+            background-image: 
+                linear-gradient(45deg, #4f46e5 25%, transparent 25%), 
+                linear-gradient(-45deg, #4f46e5 25%, transparent 25%), 
+                linear-gradient(45deg, transparent 75%, #4f46e5 75%), 
+                linear-gradient(-45deg, transparent 75%, #4f46e5 75%);
+            background-size: 16px 16px;
+            background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+        }
+
+        /* 3D Perspective Envelope Container */
+        .envelope-3d-wrapper {
+            perspective: 1200px;
+        }
+
+        /* Large Prominent Envelope Structure */
+        .envelope-card {
+            position: relative;
+            width: 92vw;
+            max-width: 620px;
+            height: 380px;
+            background: linear-gradient(145deg, #111228 0%, #080915 100%);
+            border-radius: 20px;
+            border: 2px solid rgba(99, 102, 241, 0.65);
+            box-shadow: 
+                0 25px 60px rgba(0, 0, 0, 0.95),
+                0 0 40px rgba(99, 102, 241, 0.35),
+                inset 0 0 25px rgba(79, 70, 229, 0.25);
+            transition: transform 0.5s ease, box-shadow 0.5s ease;
+        }
+
+        @media (min-width: 640px) {
+            .envelope-card {
+                height: 410px;
+            }
+        }
+
+        .envelope-card:hover {
+            transform: translateY(-8px) rotateX(4deg);
+            box-shadow: 
+                0 32px 70px rgba(0, 0, 0, 0.98),
+                0 0 50px rgba(99, 102, 241, 0.55),
+                inset 0 0 30px rgba(99, 102, 241, 0.35);
+        }
+
+        /* Envelope Top Flap 3D Animation */
+        .envelope-top-flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 52%;
+            background: linear-gradient(180deg, #212452 0%, #111228 100%);
+            clip-path: polygon(0 0, 100% 0, 50% 100%);
+            transform-origin: top;
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 6;
+            border-top: 2px solid #6366f1;
+        }
+
+        /* Pocket Layers */
+        .pocket-bottom {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 62%;
+            background: linear-gradient(0deg, #161836 0%, #0e0f22 100%);
+            clip-path: polygon(0 100%, 100% 100%, 50% 0%);
+            z-index: 4;
+            border-bottom: 2px solid #6366f1;
+        }
+
+        .pocket-left {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(90deg, #13142e 0%, #0a0b1c 100%);
+            clip-path: polygon(0 0, 0 100%, 100% 50%);
+            z-index: 3;
+        }
+
+        .pocket-right {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(-90deg, #13142e 0%, #0a0b1c 100%);
+            clip-path: polygon(100% 0, 100% 100%, 0 50%);
+            z-index: 3;
+        }
+
+        /* Open Flap State */
+        .envelope-card.is-open .envelope-top-flap {
+            transform: rotateX(180deg);
+            z-index: 1;
+        }
+
+        /* Wax Seal Badge (Lightning & Heart Icon) */
+        .racing-seal {
+            position: absolute;
+            top: 48%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6366f1 0%, #3b82f6 50%, #1e1b4b 100%);
+            box-shadow: 0 0 30px rgba(99, 102, 241, 0.85), 0 0 15px rgba(0, 0, 0, 0.9);
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.4s ease;
+            cursor: pointer;
+            border: 2px solid #818cf8;
+        }
+
+        .racing-seal:hover {
+            transform: translate(-50%, -50%) scale(1.12) rotate(6deg);
+            box-shadow: 0 0 40px rgba(129, 140, 248, 1), 0 0 20px rgba(59, 130, 246, 0.9);
+        }
+
+        /* Large Expanded Letter Canvas Sheet */
+        .letter-container-xl {
+            width: 100%;
+            max-width: 850px;
+            background: #0d0f1e;
+            background-image: 
+                radial-gradient(circle at 10% 10%, rgba(99, 102, 241, 0.18), transparent 45%),
+                radial-gradient(circle at 90% 90%, rgba(59, 130, 246, 0.15), transparent 45%);
+            border: 2px solid rgba(99, 102, 241, 0.55);
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.98), 0 0 45px rgba(99, 102, 241, 0.35);
+        }
+
+        /* Neon Text Glow */
+        .text-glow-indigo {
+            text-shadow: 0 0 12px rgba(99, 102, 241, 0.85), 0 0 26px rgba(99, 102, 241, 0.45);
+        }
+
+        /* Equalizer Animation */
+        .eq-bar {
+            width: 3px;
+            background-color: #818cf8;
+            border-radius: 2px;
+            animation: eqPulse 1.2s ease-in-out infinite alternate;
+        }
+
+        @keyframes eqPulse {
+            0% { height: 4px; }
+            100% { height: 18px; }
+        }
+
+        .eq-bar:nth-child(1) { animation-delay: 0.1s; }
+        .eq-bar:nth-child(2) { animation-delay: 0.3s; }
+        .eq-bar:nth-child(3) { animation-delay: 0.2s; }
+        .eq-bar:nth-child(4) { animation-delay: 0.4s; }
+
+        /* Custom Scrollbar */
+        .custom-scroll::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: #080914;
+            border-radius: 4px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #4f46e5;
+            border-radius: 4px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb:hover {
+            background: #6366f1;
+        }
+    </style>
+</head>
+
+<body class="bg-race-ambient speed-lines min-h-screen flex items-center justify-center p-3 sm:p-6 relative">
+
+    <!-- Audio Element for "Labios Rotos - Zoé" -->
+    <audio id="bgMusic" loop preload="auto">
+        <source src="Labios Rotos Zoe.mp3" type="audio/mpeg">
+        <source src="Labios Rotos - Zoe.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- MAIN CENTERED INTERACTIVE ENVELOPE -->
+    <main class="w-full flex flex-col items-center justify-center relative my-auto py-2">
+        
+        <!-- ENVELOPE CONTAINER -->
+        <div id="envelopeContainer" class="envelope-3d-wrapper cursor-pointer select-none" onclick="openLetter()">
+            
+            <div id="envelopeCard" class="envelope-card flex items-center justify-center mx-auto">
+                
+                <!-- Checkered Border Accent Top/Bottom -->
+                <div class="absolute top-0 left-0 w-full h-3 checker-border opacity-80 rounded-t-2xl z-10"></div>
+                <div class="absolute bottom-0 left-0 w-full h-3 checker-border opacity-80 rounded-b-2xl z-10"></div>
+
+                <!-- Envelope Top Opening Flap -->
+                <div class="envelope-top-flap"></div>
+
+                <!-- Racing Wax Seal Badge (Lightning + Heart) -->
+                <div id="racingSeal" class="racing-seal group" title="Haz clic para abrir">
+                    <div class="w-full h-full rounded-full bg-darkBg flex flex-col items-center justify-center text-center p-1 border border-indigoNeon/60">
+                        <div class="flex items-center justify-center gap-0.5 text-indigoGlow">
+                            <i class="fa-solid fa-bolt text-sm"></i>
+                            <i class="fa-solid fa-heart text-xs text-indigoNeon"></i>
+                        </div>
+                        <span class="text-[8px] font-racing text-white tracking-tighter uppercase mt-0.5">ABRIR</span>
+                    </div>
+                </div>
+
+                <!-- Envelope Pocket Folds -->
+                <div class="pocket-left"></div>
+                <div class="pocket-right"></div>
+                <div class="pocket-bottom"></div>
+
+                <!-- Envelope Recipient Label -->
+                <div class="absolute bottom-7 sm:bottom-9 z-20 text-center px-4 w-full">
+                    <span class="text-[10px] font-racing text-indigoGlow tracking-widest uppercase bg-indigoMid/70 px-3 py-0.5 rounded-full border border-indigoVibrant/50">
+                        PARA MI NIÑO
+                    </span>
+                    <h2 class="font-racing text-2xl sm:text-4xl text-white text-glow-indigo mt-1.5">Dylancito 🏁💙</h2>
+                    <p class="text-xs text-indigo-300 font-sans mt-1.5 flex items-center justify-center gap-1.5 opacity-90">
+                        <i class="fa-solid fa-hand-pointer text-indigoNeon animate-bounce"></i> Toca el sobre para abrir la cartita
+                    </p>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- EXPANDED LETTER MODAL -->
+        <div id="letterModal" class="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-5 bg-black/85 backdrop-blur-lg transition-all duration-500 opacity-0 pointer-events-none">
+            
+            <div id="letterSheet" class="letter-container-xl rounded-2xl flex flex-col max-h-[92vh] overflow-hidden relative transform scale-95 transition-all duration-500">
+                
+                <!-- Header Inside Letter Modal -->
+                <div class="bg-indigoBase/95 border-b border-indigoVibrant/40 p-3 sm:p-5 flex items-center justify-between z-10 flex-shrink-0">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-indigoMid border border-indigoNeon/60 flex items-center justify-center text-indigoGlow shadow-md">
+                            <i class="fa-solid fa-heart-pulse text-lg"></i>
+                        </div>
+                        <div>
+                            <h2 class="font-racing text-base sm:text-xl text-white">Carta para Dylancito</h2>
+                            <p class="text-[11px] text-indigo-300 font-tech">De: Bluiiiiiiiiii</p>
+                        </div>
+                    </div>
+
+                    <!-- Return to Envelope Button -->
+                    <button onclick="closeLetter()" class="px-3.5 py-2 rounded-xl bg-indigoMid hover:bg-indigoVibrant text-indigo-100 border border-indigoNeon/50 text-xs font-racing flex items-center gap-2 transition-all active:scale-95 shadow-lg">
+                        <i class="fa-solid fa-box-archive text-indigoGlow"></i> 
+                        <span class="hidden sm:inline">Guardar en sobre</span>
+                    </button>
+                </div>
+
+                <!-- Checkered Accent Line -->
+                <div class="h-2 w-full checker-border opacity-90 flex-shrink-0"></div>
+
+                <!-- Music Player Controls (Labios Rotos - Zoé) -->
+                <div class="mx-3 sm:mx-6 mt-4 p-3 bg-darkCard/90 border border-indigoNeon/40 rounded-xl flex items-center gap-3 shadow-lg flex-shrink-0">
+                    <!-- Play/Pause Button -->
+                    <button id="playPauseBtn" onclick="toggleAudio()" class="w-10 h-10 rounded-xl bg-indigoVibrant hover:bg-indigoNeon text-white flex items-center justify-center shadow-md shadow-indigo-900/50 transition-all flex-shrink-0 active:scale-90">
+                        <i id="playIcon" class="fa-solid fa-play text-sm"></i>
+                    </button>
+
+                    <!-- Song Info & Progress -->
+                    <div class="flex-grow min-w-0">
+                        <div class="flex justify-between items-center text-xs mb-1">
+                            <div class="flex items-center gap-2 truncate">
+                                <span class="font-semibold text-white truncate"><i class="fa-solid fa-music text-indigoNeon mr-1.5"></i>Labios Rotos - Zoé</span>
+                                <!-- Equalizer Bars -->
+                                <div id="eqContainer" class="flex items-end gap-0.5 h-4 opacity-70">
+                                    <div class="eq-bar"></div>
+                                    <div class="eq-bar"></div>
+                                    <div class="eq-bar"></div>
+                                    <div class="eq-bar"></div>
+                                </div>
+                            </div>
+                            <span id="audioTimer" class="font-mono text-[10px] text-indigo-300 ml-2">0:00</span>
+                        </div>
+                        
+                        <!-- Progress Bar -->
+                        <div class="w-full bg-indigoBase rounded-full h-2 overflow-hidden cursor-pointer border border-indigoVibrant/30" onclick="seekAudio(event)">
+                            <div id="audioProgressBar" class="bg-gradient-to-r from-indigoVibrant via-indigoNeon to-raceBlue h-full w-0 transition-all duration-150"></div>
+                        </div>
+                    </div>
+
+                    <!-- Local MP3 Loader Option -->
+                    <label class="cursor-pointer text-indigo-300 hover:text-white text-xs px-2.5 py-2 rounded-lg border border-indigoVibrant/40 bg-indigoBase/80 flex items-center gap-1 flex-shrink-0" title="Cargar archivo MP3">
+                        <i class="fa-solid fa-folder-open text-indigoNeon"></i>
+                        <span class="hidden md:inline text-[11px]">Cargar MP3</span>
+                        <input type="file" id="localAudioInput" accept="audio/*" class="hidden" onchange="handleLocalAudio(event)">
+                    </label>
+                </div>
+
+                <!-- FULL EXACT LETTER CONTENT -->
+                <div class="p-4 sm:p-8 space-y-6 overflow-y-auto custom-scroll font-sans text-slate-100 text-base sm:text-lg leading-relaxed flex-grow">
+                    
+                    <!-- Salutation Header -->
+                    <div class="border-b border-indigoVibrant/30 pb-4 flex justify-between items-end">
+                        <div>
+                            <span class="text-xs font-racing text-indigoGlow uppercase tracking-widest">Para:</span>
+                            <h3 class="font-racing text-2xl sm:text-4xl text-white text-glow-indigo">Dylancito</h3>
+                        </div>
+                        <div class="flex items-center gap-1.5 text-2xl sm:text-3xl">
+                            🏁💙
+                        </div>
+                    </div>
+
+                    <!-- Paragraph 1 -->
+                    <p class="font-letter text-xl sm:text-2xl text-indigo-200 leading-normal">
+                        Ola mi niño lindooooooooo.<br>
+                        ¿Cómo te está yendo?, akjfhkjsd, espero que super biennnnn como siempre amod.<br>
+                        Ya que no pude terminar tu carta pq spawneaste en el momento justo, vdd????, jkaddkjfakd, intenté hacerte una cartita algo distinta a lo que quizá te hayan dado en algún otro momento, y claro, aprovechando mis increíbles habilidades de informática y programación pues ajaaaa.
+                    </p>
+
+                    <!-- Paragraph 2 -->
+                    <div class="p-4 sm:p-5 rounded-2xl bg-indigoBase/60 border-l-4 border-indigoNeon text-slate-200 text-base sm:text-lg shadow-inner">
+                        Buenobueno, yo seeee que aún no somos novios officially peeeero quería darte algo que te gustara y bueno, no fue mucho pero te lo regalo con todo el cariño y amor del mundo. En verdad que han pasado muy pocos días desde que te conocí y durante ese tiempo te has convertido en mi salvavidas, sabes?, esa persona con la que quisiera compartir los últimos días de mi vida y alguien en quien me puedo apoyar.
+                    </div>
+
+                    <!-- Paragraph 3 -->
+                    <p class="text-slate-200">
+                        Ahorita no ha pasado, pero hay veces en las que soy super intensa, osea, no en la manera de celos o bueno, no tanto en esa cuestión, es más como que en expresar lo que siento y mandar textotes en las madrugadas, así que de una vez te pido perdón por si en algún momento te sientes muy abrumado, y, si es así no dudes en decírmelo porfa, jeje.
+                    </p>
+
+                    <!-- Paragraph 4 -->
+                    <p class="text-slate-200">
+                        Igual muchas gracias por lo que has compartido conmigo en estos días y por haberme ayudado cuando me puse a llorar JAJJAJA, no soy muy buena expresandome en persona y me cuesta mucho hablarlo entonces tenme paciencia con eso, igual intentaré no guardar ni ocultarte si me pasa algo, vale?<br>
+                        Gracias por esos abrazos y esos besitos que me das, sinceramente nunca había estado con alguien que fuera así de meloso y tierno, y bueno, no es que pueda decir mucho con mi relación y media anteriores asi que x, AJFDKAHKFDH.
+                    </p>
+
+                    <!-- Paragraph 5 -->
+                    <div class="p-5 sm:p-6 rounded-2xl bg-gradient-to-br from-indigoMid/70 via-indigoBase to-darkCard border border-indigoNeon/40 space-y-3 shadow-xl">
+                        <p class="text-indigo-100 font-medium">
+                            De verdad que eres un niño super increíble, que, aunque no te lo había dicho, cuando te vi por primera vez, me pareciste alguien muy interesante y divertido, que cuando me pediste mi ig me emocioné un poquito (estabatemblando JAJAJA), es como que hice "click" jakjkjd, ns, me gustaste y osea como no me ibas a gustar si eres tan mhhhhhhh, con esa mirada, esa sonrisa que me derrite y esas manos, ahhhh, me encantas.
+                        </p>
+                        <p class="text-indigo-300 font-semibold italic text-sm sm:text-base pt-1 border-t border-indigoVibrant/30">
+                            Yo siento que has sido el primer niño del que me he enamorado así de rápido y de esta manera. Me haces sentir cosas que nunca creí que sentiría y pues como te dije, me has robado muchas de mis primeras veces, jeje.
+                        </p>
+                    </div>
+
+                    <!-- Paragraph 6 -->
+                    <p class="text-slate-200">
+                        En fin, gracias por ABSOLUTAMENTE TODO, gracias, gracias y muchísimas gracias. Espero poder tener algo lindo contigo y que me dejes entrar a tu corazoncito de así como yo ya te deje entrar al mío.
+                    Prometo cuidar de él con mi vida, como dice la canción de fondo, jeje. Teladedico mi amor precioso...
+                    </p>
+
+                    <!-- Paragraph 7 (Grand Love Declaration) -->
+                    <div class="p-5 sm:p-7 rounded-2xl bg-gradient-to-r from-indigoMid via-indigoBase to-black border-2 border-indigoNeon text-center space-y-2 shadow-2xl">
+                        <p class="font-racing text-xl sm:text-3xl text-white text-glow-indigo tracking-wide">
+                            TE AMO UN BUEN, ES TAAAAAAAAAAAAAANTO QUE NO PUEDO EXPLICARLO, MUCHÍSIMO.
+                        </p>
+                        <p class="text-xs sm:text-sm font-bold text-indigo-200 uppercase tracking-wider">
+                            YO DARÍA TODO PORQUE ESTUVIERAS BIENNNNNNNNKJNDAS. TE ADORO CON TOOD LO QUE TENGO Y MUCHÍSIMO MÁS.
+                        </p>
+                        <p class="text-xs sm:text-sm text-indigo-300 italic pt-1">
+                            Sabes que si necesitas algo puedes decirmelo amor.
+                        </p>
+                    </div>
+
+                    <!-- Closing & Signature -->
+                    <div class="pt-4 border-t border-indigoVibrant/40 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+                        <div>
+                            <p class="font-racing text-xl sm:text-2xl text-indigoGlow text-glow-indigo">Kuchau preciosote 🏁💙</p>
+                            <p class="text-xs text-indigo-300 font-mono mt-1">PDT: Yotambienquieromanosearte jeje</p>
+                        </div>
+                        <div class="text-right w-full sm:w-auto">
+                            <span class="text-xs text-indigo-400 font-racing uppercase block">Att:</span>
+                            <span class="text-3xl sm:text-4xl font-letter font-bold text-white text-glow-indigo">Bluiiiiiiiiii.</span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Checkered Line Bottom -->
+                <div class="h-2 w-full checker-border opacity-90 flex-shrink-0"></div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- INTERACTIVE JAVASCRIPT LOGIC -->
+    <script>
+        const audio = document.getElementById('bgMusic');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const playIcon = document.getElementById('playIcon');
+        const audioProgressBar = document.getElementById('audioProgressBar');
+        const audioTimer = document.getElementById('audioTimer');
+        const eqContainer = document.getElementById('eqContainer');
+
+        let isEnvelopeOpen = false;
+
+        // Function to trigger opening the letter
+        function openLetter() {
+            if (isEnvelopeOpen) return;
+            isEnvelopeOpen = true;
+
+            const envelopeCard = document.getElementById('envelopeCard');
+            const letterModal = document.getElementById('letterModal');
+            const letterSheet = document.getElementById('letterSheet');
+
+            // 1. Animate envelope 3D flap
+            envelopeCard.classList.add('is-open');
+
+            // 2. Fire confetti burst
+            launchConfetti();
+
+            // 3. Play audio
+            playAudio();
+
+            // 4. Reveal Modal smoothly
+            setTimeout(() => {
+                letterModal.classList.remove('pointer-events-none');
+                letterModal.classList.remove('opacity-0');
+                letterSheet.classList.remove('scale-95');
+                letterSheet.classList.add('scale-100');
+            }, 500);
+        }
+
+        // Function to close letter back to envelope
+        function closeLetter() {
+            const envelopeCard = document.getElementById('envelopeCard');
+            const letterModal = document.getElementById('letterModal');
+            const letterSheet = document.getElementById('letterSheet');
+
+            letterSheet.classList.remove('scale-100');
+            letterSheet.classList.add('scale-95');
+            letterModal.classList.add('opacity-0');
+
+            setTimeout(() => {
+                letterModal.classList.add('pointer-events-none');
+                envelopeCard.classList.remove('is-open');
+                isEnvelopeOpen = false;
+            }, 400);
+        }
+
+        function playAudio() {
+            audio.play().then(() => {
+                playIcon.className = "fa-solid fa-pause text-sm";
+                eqContainer.classList.remove('opacity-30');
+            }).catch(err => {
+                console.log("Audio waiting for explicit user interaction:", err);
+                playIcon.className = "fa-solid fa-play text-sm";
+            });
+        }
+
+        function toggleAudio() {
+            if (audio.paused) {
+                audio.play();
+                playIcon.className = "fa-solid fa-pause text-sm";
+                eqContainer.classList.remove('opacity-30');
+            } else {
+                audio.pause();
+                playIcon.className = "fa-solid fa-play text-sm";
+                eqContainer.classList.add('opacity-30');
+            }
+        }
+
+        audio.addEventListener('timeupdate', () => {
+            if (audio.duration) {
+                const percent = (audio.currentTime / audio.duration) * 100;
+                audioProgressBar.style.width = percent + '%';
+
+                const curMins = Math.floor(audio.currentTime / 60);
+                const curSecs = Math.floor(audio.currentTime % 60).toString().padStart(2, '0');
+                const durMins = Math.floor(audio.duration / 60) || 0;
+                const durSecs = Math.floor(audio.duration % 60).toString().padStart(2, '0');
+
+                audioTimer.textContent = `${curMins}:${curSecs} / ${durMins}:${durSecs}`;
+            }
+        });
+
+        function seekAudio(e) {
+            const bar = e.currentTarget;
+            const clickPos = (e.clientX - bar.getBoundingClientRect().left) / bar.offsetWidth;
+            if (audio.duration) {
+                audio.currentTime = clickPos * audio.duration;
+            }
+        }
+
+        function handleLocalAudio(e) {
+            const file = e.target.files[0];
+            if (file) {
+                audio.src = URL.createObjectURL(file);
+                playAudio();
+            }
+        }
+
+        function launchConfetti() {
+            if (typeof confetti === 'function') {
+                confetti({
+                    particleCount: 85,
+                    spread: 85,
+                    origin: { y: 0.55 },
+                    colors: ['#4f46e5', '#6366f1', '#818cf8', '#3b82f6', '#ffffff']
+                });
+            }
+        }
+    </script>
+</body>
+</html>
